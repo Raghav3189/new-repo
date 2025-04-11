@@ -1,31 +1,32 @@
 pipeline {
     agent any
 
+    environment {
+        KUBECONFIG = credentials('kubeconfig') // Replace with your Jenkins secret ID for kubeconfig
+    }
+
     stages {
-        stage('Initialize') {
+        stage('Clone Repository') {
             steps {
-                echo '✅ Starting the pipeline...'
+                checkout scm
             }
         }
 
-        stage('Build') {
+        stage('Deploy to Kubernetes') {
             steps {
-                echo '🔧 Building the project (mock)...'
-                sh 'sleep 2'
+                echo '📦 Deploying to Kubernetes...'
+                sh 'kubectl apply -f k8s/db.yml'
+                sh 'kubectl apply -f k8s/petclinic.yml'
             }
         }
+    }
 
-        stage('Test') {
-            steps {
-                echo '🧪 Running tests (mock)...'
-                sh 'sleep 1'
-            }
+    post {
+        success {
+            echo '✅ Deployment successful!'
         }
-
-        stage('Done') {
-            steps {
-                echo '🎉 Pipeline finished successfully!'
-            }
+        failure {
+            echo '❌ Deployment failed!'
         }
     }
 }
