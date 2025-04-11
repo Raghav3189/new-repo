@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        KUBECONFIG = '/var/lib/jenkins/.kube/config'
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
@@ -11,11 +15,8 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 echo '📦 Deploying to Kubernetes...'
-                sh '''
-                    export KUBECONFIG=$HOME/.kube/config
-                    kubectl apply -f k8s/db.yml --validate=false
-                    kubectl apply -f k8s/petclinic.yml --validate=false
-                '''
+                sh 'kubectl apply -f k8s/db.yml --validate=false'
+                sh 'kubectl apply -f k8s/petclinic.yml --validate=false'
             }
         }
     }
