@@ -13,8 +13,8 @@ pipeline {
                 echo '📦 Deploying to Kubernetes...'
                 sh '''
                     export KUBECONFIG=$HOME/.kube/config
-                    kubectl apply -f k8s/db.yml
-                    kubectl apply -f k8s/petclinic.yml
+                    kubectl apply -f k8s/db.yml --validate=false
+                    kubectl apply -f k8s/petclinic.yml --validate=false
                 '''
             }
         }
