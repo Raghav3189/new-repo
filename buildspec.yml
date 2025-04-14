@@ -3,4 +3,5 @@ version: 0.2
 phases:
   build:
     commands:
-      - echo "✅ Hello from the simplest buildspec.yml!"
+      - echo "Hello from clean buildspec"
+
