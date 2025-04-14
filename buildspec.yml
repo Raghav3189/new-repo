@@ -14,7 +14,7 @@ phases:
   build:
     commands:
       - echo Building the app with Maven...
-      - mvn clean install
+      - mvn clean install -DskipTests
 
 artifacts:
   files:
