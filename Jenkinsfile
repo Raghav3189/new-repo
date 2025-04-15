@@ -10,7 +10,9 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-		mvn clean install -DskipTests -Dcheckstyle.skip=true
+		sh """
+                    mvn clean install -DskipTests -Dcheckstyle.skip=true
+                """
                 echo 'Maven installed'
             }
         }
