@@ -26,7 +26,7 @@ pipeline {
                     // Run SonarQube analysis
                     sh """
                     mvn sonar:sonar \
-                        -Dsonar.projectKey=Spring PetClinic \
+                        -Dsonar.projectKey="Spring PetClinic" \
                         -Dsonar.host.url=http://35.223.44.238:9000 \
                         -Dsonar.login=${SONAR_TOKEN}
                     """
