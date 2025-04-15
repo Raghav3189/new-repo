@@ -10,7 +10,7 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-		sh """
+                sh """
                     mvn clean install -DskipTests -Dcheckstyle.skip=true
                 """
                 echo 'Maven installed'
@@ -19,16 +19,15 @@ pipeline {
 
         stage('Code Test Analysis with SonarQube') {
             environment {
-                SONAR_TOKEN = credentials('sonarqube-token') // Assuming you've stored the token in Jenkins
+                SONAR_TOKEN = credentials('sonarqube-token')
             }
             steps {
                 script {
-                    // Run SonarQube analysis
                     sh """
                     mvn sonar:sonar \
                         -Dsonar.projectKey="spring-petclinic" \
                         -Dsonar.host.url=http://35.223.44.238:9000 \
-                        -Dsonar.login=${SONAR_TOKEN}
+                        -Dsonar.token=${env.SONAR_TOKEN}
                     """
                 }
             }
@@ -44,4 +43,3 @@ pipeline {
         }
     }
 }
-
