@@ -27,7 +27,8 @@ pipeline {
                     mvn sonar:sonar \
                         -Dsonar.projectKey="spring-petclinic" \
                         -Dsonar.host.url=http://35.223.44.238:9000 \
-                        -Dsonar.token=${env.SONAR_TOKEN}
+                        -Dsonar.token=${env.SONAR_TOKEN} \
+                        -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
                     """
                 }
             }
