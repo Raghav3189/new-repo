@@ -31,7 +31,7 @@ pipeline {
                     sh """
                     mvn sonar:sonar \
                         -Dsonar.projectKey="spring-petclinic" \
-                        -Dsonar.host.url=https://34.27.174.138:9000 \
+                        -Dsonar.host.url=https://34.55.173.9:9000 \
                         -Dsonar.token=${env.SONAR_TOKEN} \
                         -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
                     """
