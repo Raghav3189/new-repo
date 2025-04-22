@@ -8,12 +8,18 @@ pipeline {
             }
         }
 
-        stage('Build with Maven') {
+        stage('Build, Install and Deploy with Maven') {
             steps {
                 sh """
-                    mvn clean install -DskipTests -Dcheckstyle.skip=true
+                    mvn clean install
                 """
-                echo 'Maven installed'
+                echo 'Maven build and install completed'
+
+                sh """
+                    mvn clean deploy \
+                        -DaltDeploymentRepository=nexus-snapshots::default::http://34.45.47.208:8081/repository/springboot-snapshots/
+                """
+                echo 'Maven deploy completed'
             }
         }
 
@@ -26,7 +32,7 @@ pipeline {
                     sh """
                     mvn sonar:sonar \
                         -Dsonar.projectKey="spring-petclinic" \
-                        -Dsonar.host.url=http://35.223.44.238:9000 \
+                        -Dsonar.host.url=https://35.223.44.238:9000 \
                         -Dsonar.token=${env.SONAR_TOKEN} \
                         -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
                     """

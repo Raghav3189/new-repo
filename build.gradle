@@ -1,0 +1,57 @@
+plugins {
+    id 'maven-publish'
+    id 'java'
+}
+
+group = 'org.springframework.samples'
+version = '3.4.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId = 'org.springframework.samples'
+            artifactId = 'spring-petclinic'
+            version = project.version
+            artifact sourceSets.main.output
+        }
+    }
+    repositories {
+        maven {
+            def releasesUrl = "https://34.45.47.208:8081/repository/petclinicapp/"
+            def snapshotsUrl = "https://34.45.47.208:8081/repository/springboot-snapshots/"
+
+            url = version.endsWith('SNAPSHOT') ? snapshotsUrl : releasesUrl
+
+            credentials {
+                username = project.findProperty('nexusUsername') ?: System.getenv('NEXUS_USERNAME')
+                password = project.findProperty('nexusPassword') ?: System.getenv('NEXUS_PASSWORD')
+            }
+        }
+    }
+}
+
+tasks.register('publishToNexus') {
+    dependsOn 'publish'
+}
+
+jar {
+    manifest {
+        attributes(
+            'Implementation-Title': 'Spring PetClinic',
+            'Implementation-Version': version
+        )
+    }
+}
