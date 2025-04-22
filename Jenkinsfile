@@ -38,14 +38,22 @@ pipeline {
                 }
             }
         }
+	
+	stage('Deploy to Kubernetes') {
+            steps {
+                echo 'Deploying to Kubernetes...'
+                sh 'kubectl apply -f k8s/db.yml --validate=false'
+                sh 'kubectl apply -f k8s/petclinic.yml --validate=false'
+            }
+	}
     }
 
     post {
         success {
-            echo '✅ Deployment successful!'
+            echo 'Deployment successful!'
         }
         failure {
-            echo '❌ Deployment failed!'
+            echo ' Deployment failed!'
         }
     }
 }
