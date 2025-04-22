@@ -16,8 +16,7 @@ pipeline {
                 echo 'Maven build and install completed'
 
                 sh """
-                    mvn clean deploy \
-                        -DaltDeploymentRepository=nexus-snapshots::default::http://34.45.47.208:8081/repository/springboot-snapshots/
+                    mvn clean deploy 
                 """
                 echo 'Maven deploy completed'
             }
