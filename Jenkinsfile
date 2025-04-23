@@ -61,8 +61,8 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 echo 'Deploying to Kubernetes...'
-                sh 'kubectl apply -f k8s/db.yml --validate=false'
-                sh 'kubectl apply -f k8s/petclinic.yml --validate=false'
+                sh 'minikube kubectl apply -f k8s/db.yml --validate=false'
+                sh 'minikube kubectl apply -f k8s/petclinic.yml --validate=false'
             }
         }
     }
