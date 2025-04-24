@@ -58,21 +58,30 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Deploy Kubernetes Manifests') {
             steps {
-                echo 'Deploying to Kubernetes...'
-                sh 'minikube kubectl apply -f k8s/db.yml --validate=false'
-                sh 'minikube kubectl apply -f k8s/petclinic.yml --validate=false'
+                sh '''
+                    gcloud auth activate-service-account --key-file=/var/lib/jenkins/gcp-creds/gcp-key.json
+                    gcloud config set project trusty-wares-454707-d7
+                    gcloud container clusters get-credentials my-cluster-1 --zone us-east1-b --project trusty-wares-454707-d7
+                    kubectl apply -f k8s/
+                '''
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh 'kubectl get all'
             }
         }
     }
 
     post {
         success {
-            echo '✅ Deployment successful!'
+            echo 'Deployment successful!'
         }
         failure {
-            echo '❌ Deployment failed!'
+            echo 'Deployment failed!'
         }
     }
 }
