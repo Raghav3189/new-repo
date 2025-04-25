@@ -9,16 +9,22 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 checkout scm
+                echo 'Repository cloned successfully.'
             }
         }
 
         stage('Build, Install and Deploy with Maven') {
             steps {
                 sh 'mvn clean install'
-                echo 'Maven build and install completed'
+                echo 'Maven build and install completed.'
 
                 sh 'mvn deploy'
-                echo 'Maven deploy completed'
+                echo 'Maven deploy completed.'
+
+                script {
+                    def artifact = sh(script: "ls target/*.jar", returnStdout: true).trim()
+                    echo "Artifact built: ${artifact}"
+                }
             }
         }
 
@@ -27,19 +33,35 @@ pipeline {
                 SONAR_TOKEN = credentials('sonarqube-token')
             }
             steps {
-                sh """
-                    mvn sonar:sonar \
-                        -Dsonar.projectKey="spring-petclinic" \
-                        -Dsonar.host.url=http://34.55.173.9:9000 \
-                        -Dsonar.token=${SONAR_TOKEN} \
-                        -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-                """
+                script {
+                    sh """
+                        mvn sonar:sonar \
+                            -Dsonar.projectKey="spring-petclinic" \
+                            -Dsonar.host.url=http://34.55.173.9:9000 \
+                            -Dsonar.token=${SONAR_TOKEN} \
+                            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+                    """
+
+                    sleep(time: 10, unit: 'SECONDS')
+
+                    def sonarMetrics = sh(
+                        script: """curl -s -u ${SONAR_TOKEN}: \
+                            'http://34.55.173.9:9000/api/measures/component?component=spring-petclinic&metricKeys=coverage,bugs,vulnerabilities,code_smells'""",
+                        returnStdout: true
+                    ).trim()
+
+                    echo "SonarQube Analysis:"
+                    echo sonarMetrics
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t ${DOCKER_IMAGE} ."
+                echo "Docker image ${DOCKER_IMAGE} built."
+
+                sh "docker images | grep ${DOCKER_IMAGE}"
             }
         }
 
@@ -54,6 +76,7 @@ pipeline {
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                         docker push ${DOCKER_IMAGE}
                     """
+                    echo "Docker image pushed: ${DOCKER_IMAGE}"
                 }
             }
         }
@@ -66,22 +89,26 @@ pipeline {
                     gcloud container clusters get-credentials my-cluster-1 --zone us-east1-b --project trusty-wares-454707-d7
                     kubectl apply -f k8s/
                 '''
+                echo 'Kubernetes manifests applied.'
             }
         }
 
         stage('Verify Deployment') {
             steps {
                 sh 'kubectl get all'
+                sh 'kubectl get pods -o wide'
+                sh 'kubectl get svc'
+                echo 'Kubernetes resources verified.'
             }
         }
     }
 
     post {
         success {
-            echo 'Deployment successful!'
+            echo 'Deployment successful.'
         }
         failure {
-            echo 'Deployment failed!'
+            echo 'Deployment failed.'
         }
     }
 }
