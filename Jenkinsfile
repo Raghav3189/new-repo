@@ -45,14 +45,27 @@ pipeline {
 
                         sleep(time: 10, unit: 'SECONDS')
 
-                        def sonarMetrics = sh(
+                        def sonarJson = sh(
                             script: """curl -s -u $TOKEN: \
                                 'http://34.55.173.9:9000/api/measures/component?component=spring-petclinic&metricKeys=coverage,bugs,vulnerabilities,code_smells'""",
                             returnStdout: true
                         ).trim()
 
-                        echo "SonarQube Analysis:"
-                        echo sonarMetrics
+                        def metrics = readJSON text: sonarJson
+                        def measures = metrics.component.measures
+
+                        def smells = measures.find { it.metric == 'code_smells' }?.value ?: 'N/A'
+                        def bugs = measures.find { it.metric == 'bugs' }?.value ?: 'N/A'
+                        def coverage = measures.find { it.metric == 'coverage' }?.value ?: 'N/A'
+                        def vulns = measures.find { it.metric == 'vulnerabilities' }?.value ?: 'N/A'
+
+                        echo """
+                        SonarQube Analysis:
+                        - Code Smells: ${smells}
+                        - Bugs: ${bugs}
+                        - Coverage: ${coverage}%
+                        - Vulnerabilities: ${vulns}
+                        """
                     }
                 }
             }
