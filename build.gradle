@@ -30,8 +30,8 @@ publishing {
     }
     repositories {
         maven {
-            def releasesUrl = "https://34.45.47.208:8081/repository/petclinicapp/"
-            def snapshotsUrl = "https://34.45.47.208:8081/repository/springboot-snapshots/"
+            def releasesUrl = "https://34.57.183.35:8081/repository/petclinicapp/"
+            def snapshotsUrl = "https://34.57.183.35:8081/repository/springboot-snapshots/"
 
             url = version.endsWith('SNAPSHOT') ? snapshotsUrl : releasesUrl
 

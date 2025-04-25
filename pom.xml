@@ -21,11 +21,11 @@
   <distributionManagement>
     <repository>
       <id>nexus-releases</id>
-      <url>http://34.45.47.208:8081/repository/petclinicapp/</url>
+      <url>http://34.57.183.35/:8081/repository/petclinicapp/</url>
     </repository>
     <snapshotRepository>
       <id>nexus-snapshots</id>
-      <url>http://34.45.47.208:8081/repository/springboot-snapshots/</url>
+      <url>http://34.57.183.35:8081/repository/springboot-snapshots/</url>
     </snapshotRepository>
   </distributionManagement>
 
