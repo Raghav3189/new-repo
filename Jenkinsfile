@@ -33,19 +33,19 @@ pipeline {
                 SONAR_TOKEN = credentials('sonarqube-token')
             }
             steps {
-                script {
-                    sh """
+                withEnv(["TOKEN=${SONAR_TOKEN}"]) {
+                    sh '''
                         mvn sonar:sonar \
                             -Dsonar.projectKey="spring-petclinic" \
                             -Dsonar.host.url=http://34.55.173.9:9000 \
-                            -Dsonar.token=${SONAR_TOKEN} \
+                            -Dsonar.token=$TOKEN \
                             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-                    """
+                    '''
 
                     sleep(time: 10, unit: 'SECONDS')
 
                     def sonarMetrics = sh(
-                        script: """curl -s -u ${SONAR_TOKEN}: \
+                        script: """curl -s -u $TOKEN: \
                             'http://34.55.173.9:9000/api/measures/component?component=spring-petclinic&metricKeys=coverage,bugs,vulnerabilities,code_smells'""",
                         returnStdout: true
                     ).trim()
@@ -60,8 +60,6 @@ pipeline {
             steps {
                 sh "docker build -t ${DOCKER_IMAGE} ."
                 echo "Docker image ${DOCKER_IMAGE} built."
-
-                sh "docker images | grep ${DOCKER_IMAGE}"
             }
         }
 
