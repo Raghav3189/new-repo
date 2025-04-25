@@ -34,24 +34,26 @@ pipeline {
             }
             steps {
                 withEnv(["TOKEN=${SONAR_TOKEN}"]) {
-                    sh '''
-                        mvn sonar:sonar \
-                            -Dsonar.projectKey="spring-petclinic" \
-                            -Dsonar.host.url=http://34.55.173.9:9000 \
-                            -Dsonar.token=$TOKEN \
-                            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-                    '''
+                    script {
+                        sh '''
+                            mvn sonar:sonar \
+                                -Dsonar.projectKey="spring-petclinic" \
+                                -Dsonar.host.url=http://34.55.173.9:9000 \
+                                -Dsonar.token=$TOKEN \
+                                -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+                        '''
 
-                    sleep(time: 10, unit: 'SECONDS')
+                        sleep(time: 10, unit: 'SECONDS')
 
-                    def sonarMetrics = sh(
-                        script: """curl -s -u $TOKEN: \
-                            'http://34.55.173.9:9000/api/measures/component?component=spring-petclinic&metricKeys=coverage,bugs,vulnerabilities,code_smells'""",
-                        returnStdout: true
-                    ).trim()
+                        def sonarMetrics = sh(
+                            script: """curl -s -u $TOKEN: \
+                                'http://34.55.173.9:9000/api/measures/component?component=spring-petclinic&metricKeys=coverage,bugs,vulnerabilities,code_smells'""",
+                            returnStdout: true
+                        ).trim()
 
-                    echo "SonarQube Analysis:"
-                    echo sonarMetrics
+                        echo "SonarQube Analysis:"
+                        echo sonarMetrics
+                    }
                 }
             }
         }
